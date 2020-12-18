@@ -7,6 +7,7 @@ const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
 const Campground = require('./models/campground');
+const Review = require('./models/review');
 const { join } = require('path');
 
 const app = express();
@@ -97,6 +98,22 @@ app.delete(
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
+  })
+);
+
+app.post(
+  '/campgrounds/:id/reviews',
+  catchAsync(async (req, res) => {
+    // find associated campground
+    const campground = await Campground.findById(req.params.id);
+    // create new review instance
+    const review = new Review(req.body.review);
+    // add review into the found campground document
+    campground.reviews.push(review);
+    // save both review and campground docs
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
   })
 );
 
