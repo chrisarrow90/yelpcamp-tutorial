@@ -2,10 +2,13 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
+const Joi = require('joi');
+const { campgroundSchema } = require('./joiSchemas.js');
 const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
 const Campground = require('./models/campground');
+const { join } = require('path');
 
 const app = express();
 
@@ -26,6 +29,17 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
   console.log('Database connected');
 });
+
+// JOI Validation Middleware
+const validateCampground = (req, res, next) => {
+  const { error } = campgroundSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map((ele) => ele.message).join(',');
+    throw new ExpressError(400, msg);
+  } else {
+    next();
+  }
+};
 
 // Routes
 app.get('/', (req, res) => {
@@ -51,8 +65,9 @@ app.get(
 
 app.post(
   '/campgrounds',
+  validateCampground,
   catchAsync(async (req, res, next) => {
-    if (!req.body.campground) throw new ExpressError(400, 'Invalid Campground Data');
+    // if (!req.body.campground) throw new ExpressError(400, 'Invalid Campground Data');
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`);
@@ -69,6 +84,7 @@ app.get(
 
 app.put(
   '/campgrounds/:id',
+  validateCampground,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
