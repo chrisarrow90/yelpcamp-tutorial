@@ -1,25 +1,13 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true }); // reqd to get params from the app.js route
 const catchAsync = require('../utils/catchAsync');
-const ExpressError = require('../utils/ExpressError');
-const { reviewSchema } = require('../joiSchemas.js');
 const Campground = require('../models/campground');
 const Review = require('../models/review');
-
-// JOI Validation Middleware
-const validateReview = (req, res, next) => {
-  const { error } = reviewSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((ele) => ele.message).join(',');
-    throw new ExpressError(400, msg);
-  } else {
-    next();
-  }
-};
+const { isValidReview } = require('../middleware.js');
 
 router.post(
   '/',
-  validateReview,
+  isValidReview,
   catchAsync(async (req, res) => {
     // find associated campground
     const campground = await Campground.findById(req.params.id);
