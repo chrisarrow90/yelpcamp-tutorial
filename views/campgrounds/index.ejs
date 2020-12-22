@@ -8,7 +8,7 @@
     <div class="card mb-3">
       <div class="row">
         <div class="col-md-4">
-          <img class="img-fluid" src="<%= campground.images[(Math.floor(Math.random() * campground.images.length))].url %>" alt="">
+          <img class="img-fluid" src="<%= campground.images.length > 0 ? campground.images[(Math.floor(Math.random() * campground.images.length))].url : 'https://res.cloudinary.com/dngdf3hop/image/upload/v1608648219/YelpCamp/iu3pyihcbnqczgj35umk.jpg' %>" alt="">
         </div>
         <div class="col-md-8">
           <h5 class="card-title"><%= campground.title %></h5>
