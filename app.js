@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -62,7 +66,7 @@ db.once('open', () => {
 // Middleware on all routes
 app.use((req, res, next) => {
   // if coming from any route other than login or homepage. set returnTo equal to where you are coming from
-  if (!['/login', '/'].includes(req.originalUrl)) {
+  if (!['/login', '/', '/logout'].includes(req.originalUrl)) {
     req.session.returnTo = req.originalurl;
   }
 
