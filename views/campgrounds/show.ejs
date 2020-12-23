@@ -2,8 +2,7 @@
 <link rel="stylesheet" href="/styles/stars.css">
 
 <div class="row">
-  <div class="col-6">
-    <div id='map' style='width: 400px; height: 300px;'></div>
+  <div class="col-md-6">
     <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
       <% if(campground.images.length > 1) { %> 
       <ol class="carousel-indicators">
@@ -41,6 +40,7 @@
         <li class="list-group-item">Submitted by <%= campground.author.username %></li>
         <li class="list-group-item">$<%= campground.price %>/night</li>
       </ul>
+
       <% if(currentUser && campground.author.equals(currentUser._id)) { %> 
       <div class="card-body">
         <a class="card-link btn btn-info" href="/campgrounds/<%= campground._id %>/edit">Edit</a>
@@ -54,7 +54,9 @@
       </div>
     </div>
   </div>
-  <div class="col-6">
+  <div class="col-md-6">
+    <div id='map'></div>
+    
     <% if(currentUser) { %> 
     <h2>Leave a Review</h2>
     <form class="validated-form mb-3" action="/campgrounds/<%= campground._id %>/reviews" method="POST" novalidate>
