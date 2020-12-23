@@ -20,6 +20,7 @@ const userRoutes = require('./routes/users');
 
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
+const MongoDBStore = require('connect-mongo')(session);
 
 const app = express();
 
@@ -33,6 +34,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
 app.use(mongoSanitize());
 app.use(helmet());
+
+// Database Connection
+const dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017/yelp-camp';
+
+mongoose.connect(dbURI, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+  console.log('Database connected');
+});
 
 // Helmet Configuration
 const scriptSrcUrls = [
@@ -85,9 +102,21 @@ app.use(
 );
 
 // express-session configuration
+const secret = process.env.SESSION_SECRET || 'devbackup';
+const store = new MongoDBStore({
+  url: dbURI,
+  secret,
+  touchAfter: 24 * 60 * 60,
+});
+
+store.on('error', function (e) {
+  console.log('Session Store Error', e);
+});
+
 const sessionConfig = {
+  store,
   name: 'session',
-  secret: 'dummysecret',
+  secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -105,20 +134,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-
-// Database Connection
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-  console.log('Database connected');
-});
 
 // Middleware on all routes
 app.use((req, res, next) => {
