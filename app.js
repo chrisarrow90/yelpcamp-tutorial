@@ -53,7 +53,7 @@ db.once('open', () => {
 
 // Helmet Configuration
 const scriptSrcUrls = [
-  // 'https://stackpath.bootstrapcdn.com/',
+  'https://stackpath.bootstrapcdn.com/',
   'https://api.tiles.mapbox.com/',
   'https://api.mapbox.com/',
   'https://kit.fontawesome.com/',
@@ -63,7 +63,7 @@ const scriptSrcUrls = [
 
 const styleSrcUrls = [
   'https://kit-free.fontawesome.com/',
-  // 'https://stackpath.bootstrapcdn.com/',
+  'https://stackpath.bootstrapcdn.com/',
   'https://cdn.jsdelivr.net',
   'https://api.mapbox.com/',
   'https://api.tiles.mapbox.com/',
